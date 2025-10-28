@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Проверка номера</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    input[type="text"] { width: 100%; padding: 10px 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+    button { margin-top: 12px; padding: 10px 16px; font-size: 16px; border: none; background: #2563eb; color: white; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #1e4fd3; }
+    .result { margin-top: 16px; padding: 12px; border-radius: 6px; background: #f8fafc; border: 1px solid #e5e7eb; white-space: pre-wrap; }
+    .not-found { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Проверка по номеру</h1>
+
+    <label for="codeInput">Введите номер (штрихкод):</label>
+    <input id="codeInput" type="text" placeholder="например, 160303" inputmode="numeric" />
+
+    <button id="checkBtn">Проверить</button>
+
+    <div id="result" class="result" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+    // Справочник "номер → текст"
+    const records = {
+      "160303": "160303 Статус: Длительное хранение Состояние: Длительное хранение Влагомер весовой МL-50 № Р1010403 ИЦСМиК Лаб. №2 Курганова Е.А. Даты поверки (калибровки) отсутствуют!"
+      // Добавляйте тут новые записи:
+      // "123456": "123456 ... ваш текст ...",
+      // "987654": "987654 ... ваш текст ..."
+    };
+
+    const input = document.getElementById('codeInput');
+    const btn = document.getElementById('checkBtn');
+    const result = document.getElementById('result');
+
+    function normalize(value) {
+      // Обрезаем пробелы, удаляем невидимые символы, приводим к ровно тому виду, как хранится ключ.
+      return (value || "").trim();
+    }
+
+    function showMessage(msg, found) {
+      result.textContent = msg;
+      if (found) {
+        result.classList.remove('not-found');
+      } else {
+        result.classList.add('not-found');
+      }
+    }
+
+    function lookup() {
+      const code = normalize(input.value);
+      if (!code) {
+        showMessage('Укажите номер.', false);
+        return;
+      }
+      if (Object.prototype.hasOwnProperty.call(records, code)) {
+        showMessage(records[code], true);
+      } else {
+        showMessage('Штрихкод не зарегистрирован!', false);
+      }
+    }
+
+    // Кнопка
+    btn.addEventListener('click', lookup);
+    // Enter в поле
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') lookup();
+    });
+
+    // Фокус на поле при загрузке
+    input.focus();
+  </script>
+</body>
+</html>
